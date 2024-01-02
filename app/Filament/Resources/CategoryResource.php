@@ -24,26 +24,22 @@ class CategoryResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            //
+        return $form
+            ->schema([
+                TextInput::make('title')
+                    ->live()
+                    ->required()->minLength(1)->maxLength(150)
+                    ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
+                        if ($operation === 'edit') {
+                            return;
+                        }
 
-            TextInput::make('title')
-                ->required()
-                ->minLength(1)
-                ->maxLength(150)
-                ->live()
-                ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
-                    if ($operation === 'edit') return;
-                    $set('slug', Str::slug($state));
-                }),
-            TextInput::make('slug')
-                ->required()
-                ->unique(ignoreRecord: true)
-                ->minLength(1)
-                ->maxLength(150),
-            TextInput::make('text_color')->nullable(),
-            TextInput::make('bg_color')->nullable(),
-        ]);
+                        $set('slug', Str::slug($state));
+                    }),
+                TextInput::make('slug')->required()->minLength(1)->unique(ignoreRecord: true)->maxLength(150),
+                TextInput::make('text_color')->nullable(),
+                TextInput::make('bg_color')->nullable(),
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -54,13 +50,18 @@ class CategoryResource extends Resource
                 TextColumn::make('slug')->sortable()->searchable(),
                 TextColumn::make('text_color')->sortable()->searchable(),
                 TextColumn::make('bg_color')->sortable()->searchable(),
-                //
             ])
             ->filters([
                 //
             ])
-            ->actions([Tables\Actions\EditAction::make()])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
     }
 
     public static function getRelations(): array

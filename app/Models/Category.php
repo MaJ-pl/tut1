@@ -13,6 +13,6 @@ class Category extends Model
         'title',
         'slug',
         'text_color',
-        'bg_color'
+        'bg_color',
     ];
 }
